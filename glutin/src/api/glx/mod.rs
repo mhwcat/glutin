@@ -24,7 +24,7 @@ use crate::platform::unix::x11::XConnection;
 use crate::platform_impl::x11_utils::SurfaceType;
 use crate::{
     Api, ContextError, CreationError, GlAttributes, GlProfile, GlRequest, PixelFormat,
-    PixelFormatRequirements, ReleaseBehavior, Robustness,
+    PixelFormatRequirements, ReleaseBehavior, Robustness, SwapInterval,
 };
 
 #[derive(Clone)]
@@ -203,6 +203,25 @@ impl Context {
     #[inline]
     pub fn get_pixel_format(&self) -> PixelFormat {
         self.pixel_format.clone()
+    }
+
+    #[inline]
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        let glx = GLX.as_ref().unwrap();
+        let extra_functions = ffi::glx_extra::Glx::load_with(|proc_name| {
+            let c_str = CString::new(proc_name).unwrap();
+            unsafe { glx.GetProcAddress(c_str.as_ptr() as *const u8) as *const _ }
+        });
+
+        if extra_functions.SwapIntervalEXT.is_loaded() {            
+            unsafe {
+                extra_functions.SwapIntervalEXT(self.xconn.display as *mut _, self.drawable, swap_interval as raw::c_int);
+            }
+
+            Ok(())
+        } else {
+            Err(ContextError::FunctionUnavailable)
+        }
     }
 }
 

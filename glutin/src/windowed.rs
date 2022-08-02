@@ -282,6 +282,10 @@ impl<T: ContextCurrentState, W> ContextWrapper<T, W> {
     pub fn get_api(&self) -> Api {
         self.context.get_api()
     }
+
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        self.context.context.set_swap_interval(swap_interval)
+    }
 }
 
 impl<W> ContextWrapper<PossiblyCurrent, W> {

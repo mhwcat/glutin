@@ -37,6 +37,7 @@ fn main() {
                 "GLX_EXT_buffer_age",
                 "GLX_EXT_framebuffer_sRGB",
                 "GLX_EXT_swap_control",
+                "GLX_EXT_swap_control_tear",
                 "GLX_MESA_swap_control",
                 "GLX_SGI_swap_control",
             ],

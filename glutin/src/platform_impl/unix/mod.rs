@@ -17,7 +17,7 @@ use self::x11::X11Context;
 use crate::api::osmesa;
 use crate::{
     Api, ContextCurrentState, ContextError, CreationError, GlAttributes, NotCurrent, PixelFormat,
-    PixelFormatRequirements, Rect,
+    PixelFormatRequirements, Rect, SwapInterval,
 };
 #[cfg(feature = "x11")]
 pub use x11::utils as x11_utils;
@@ -308,6 +308,17 @@ impl Context {
             #[cfg(feature = "wayland")]
             Context::Wayland(ref ctx) => ctx.get_pixel_format(),
             _ => unreachable!(),
+        }
+    }
+
+    #[inline]
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        match *self {
+            #[cfg(feature = "x11")]
+            Context::X11(ref ctx) => ctx.set_swap_interval(swap_interval),
+            #[cfg(feature = "wayland")]
+            Context::Wayland(ref ctx) => ctx.set_swap_interval(swap_interval),
+            _ => unreachable!()
         }
     }
 }

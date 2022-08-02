@@ -662,3 +662,10 @@ pub struct Rect {
     pub width: u32,
     pub height: u32,
 }
+
+#[derive(Debug)]
+pub enum SwapInterval {
+    Immediate = 0, 
+    VerticalSync = 1,
+    Adaptive = -1
+}

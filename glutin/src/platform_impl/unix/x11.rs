@@ -9,7 +9,7 @@ use crate::platform::unix::{EventLoopWindowTargetExtUnix, WindowBuilderExtUnix, 
 use crate::platform_impl::x11_utils;
 use crate::{
     Api, ContextError, CreationError, GlAttributes, GlRequest, PixelFormat,
-    PixelFormatRequirements, Rect,
+    PixelFormatRequirements, Rect, SwapInterval,
 };
 
 use glutin_glx_sys as ffi;
@@ -665,6 +665,15 @@ impl Context {
         match self.context {
             X11Context::Glx(ref ctx) => ctx.get_pixel_format(),
             X11Context::Egl(ref ctx) => ctx.get_pixel_format(),
+        }
+    }
+
+    #[inline]
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        match self.context {
+            X11Context::Glx(ref ctx) => ctx.set_swap_interval(swap_interval),
+            X11Context::Egl(ref ctx) => ctx.set_swap_interval(swap_interval),
+            _ => unreachable!()
         }
     }
 }

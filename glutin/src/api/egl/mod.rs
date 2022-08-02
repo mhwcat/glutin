@@ -36,7 +36,7 @@ use crate::api::dlloader::{SymTrait, SymWrapper};
 use crate::Rect;
 use crate::{
     Api, ContextError, CreationError, GlAttributes, GlRequest, PixelFormat,
-    PixelFormatRequirements, ReleaseBehavior, Robustness,
+    PixelFormatRequirements, ReleaseBehavior, Robustness, SwapInterval,
 };
 
 #[derive(Clone)]
@@ -590,6 +590,21 @@ impl Context {
             0
         } else {
             buffer_age as u32
+        }
+    }
+
+    #[inline]
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        let egl = EGL.as_ref().unwrap();
+        
+        let result = unsafe {
+            egl.SwapInterval(self.display, swap_interval as ffi::egl::types::EGLint)
+        };
+
+        if result > 0 {
+            Ok(())
+        } else {
+            Err(ContextError::OsError(String::from("Failed setting swap interval")))
         }
     }
 }

@@ -2,7 +2,7 @@
 
 use crate::api::egl::{Context as EglContext, NativeDisplay, SurfaceType as EglSurfaceType};
 use crate::{
-    ContextError, CreationError, GlAttributes, PixelFormat, PixelFormatRequirements, Rect,
+    ContextError, CreationError, GlAttributes, PixelFormat, PixelFormatRequirements, Rect, SwapInterval,
 };
 
 use crate::platform::unix::{EventLoopWindowTargetExtUnix, WindowExtUnix};
@@ -191,5 +191,10 @@ impl Context {
     #[inline]
     pub fn get_pixel_format(&self) -> PixelFormat {
         (**self).get_pixel_format()
+    }
+
+    #[inline]
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        (**self).set_swap_interval(swap_interval)
     }
 }
