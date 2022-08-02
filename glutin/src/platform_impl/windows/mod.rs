@@ -2,7 +2,7 @@
 
 use crate::{
     Api, ContextCurrentState, ContextError, CreationError, GlAttributes, GlRequest, NotCurrent,
-    PixelFormat, PixelFormatRequirements, Rect,
+    PixelFormat, PixelFormatRequirements, Rect, SwapInterval,
 };
 
 use crate::api::egl::{Context as EglContext, NativeDisplay, SurfaceType as EglSurfaceType, EGL};
@@ -292,6 +292,15 @@ impl Context {
             | Context::HiddenWindowEgl(_, ref c)
             | Context::EglPbuffer(ref c) => Some(c.get_egl_display()),
             _ => None,
+        }
+    }
+
+    #[inline]
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        match *self {
+            Context::Wgl(ref c) => c.set_swap_interval(swap_interval),
+            Context::Egl(ref c) => c.set_swap_interval(swap_interval),
+            _ => unreachable!(),
         }
     }
 }

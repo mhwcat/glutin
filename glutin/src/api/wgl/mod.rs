@@ -4,7 +4,7 @@ mod make_current_guard;
 
 use crate::{
     Api, ContextError, CreationError, GlAttributes, GlProfile, GlRequest, PixelFormat,
-    PixelFormatRequirements, ReleaseBehavior, Robustness,
+    PixelFormatRequirements, ReleaseBehavior, Robustness, SwapInterval,
 };
 
 use self::make_current_guard::CurrentContextGuard;
@@ -30,6 +30,8 @@ pub struct Context {
     context: ContextWrapper,
 
     hdc: HDC,
+
+    hwnd: HWND,
 
     /// Bound to `opengl32.dll`.
     ///
@@ -146,7 +148,7 @@ impl Context {
             }
         }
 
-        Ok(Context { context, hdc, gl_library, pixel_format })
+        Ok(Context { context, hdc, hwnd: win, gl_library, pixel_format })
     }
 
     /// Returns the raw HGLRC.
@@ -212,6 +214,26 @@ impl Context {
     #[inline]
     pub fn get_pixel_format(&self) -> PixelFormat {
         self.pixel_format.clone()
+    }
+
+    #[inline]
+    pub fn set_swap_interval(&self, swap_interval: SwapInterval) -> Result<(), ContextError> {
+        let extra_functions = unsafe { load_extra_functions(self.hwnd) }
+            .map_err(|err| ContextError::OsError(err.to_string()))?;
+
+        if extra_functions.SwapIntervalEXT.is_loaded() {
+            let result = unsafe {
+                extra_functions.SwapIntervalEXT(swap_interval as raw::c_int)
+            };
+
+            if result > 0 {
+                Ok(())
+            } else {
+                Err(ContextError::OsError("Failed setting swap interval".to_string()))
+            }
+        } else {
+            Err(ContextError::FunctionUnavailable)
+        }
     }
 }
 

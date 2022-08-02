@@ -604,7 +604,7 @@ impl Context {
         if result > 0 {
             Ok(())
         } else {
-            Err(ContextError::OsError(String::from("Failed setting swap interval")))
+            Err(ContextError::OsError("Failed setting swap interval".to_string()))
         }
     }
 }
